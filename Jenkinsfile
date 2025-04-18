@@ -71,13 +71,13 @@ pipeline {
                 withCredentials([usernamePassword(credentialsId: 'john_docker_vm_creds', usernameVariable: 'USERNAME', passwordVariable: 'PASSWORD')]) {
                     script {
                         try {
-                            sh "sshpass -p '$PASSWORD' -v ssh -o StrictHostKeyChecking=no '$USERNAME'@'$DOCKER_VM' \"docker stop ${env.APPLICATION_NAME}-dev\""
-                            sh "sshpass -p '$PASSWORD' -v ssh -o StrictHostKeyChecking=no '$USERNAME'@'$DOCKER_VM' \"docker rm ${env.APPLICATION_NAME}-dev\""
+                            sh "sshpass -p '$PASSWORD' -v ssh -o StrictHostKeyChecking=no '$USERNAME'@$DOCKER_VM \"docker stop ${env.APPLICATION_NAME}-dev\""
+                            sh "sshpass -p '$PASSWORD' -v ssh -o StrictHostKeyChecking=no '$USERNAME'@$DOCKER_VM \"docker rm ${env.APPLICATION_NAME}-dev\""
                         }
                         catch (err){
                             echo "Caught Error: $err"
                         }
-                        sh "sshpass -p '$PASSWORD' -v ssh -o StrictHostKeyChecking=no '$USERNAME'@'$DOCKER_VM' \"docker container run -dit -p 8761:8761 --name ${env.APPLICATION_NAME}-dev${env.DOCKER_HUB}/${env.APPLICATION_NAME}:${GIT_COMMIT}\""
+                        sh "sshpass -p '$PASSWORD' -v ssh -o StrictHostKeyChecking=no '$USERNAME'@$DOCKER_VM \"docker container run -dit -p 8761:8761 --name ${env.APPLICATION_NAME}-dev ${env.DOCKER_HUB}/${env.APPLICATION_NAME}:${GIT_COMMIT}\""
 
                     }
                 }
