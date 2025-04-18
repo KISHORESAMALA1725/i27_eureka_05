@@ -29,10 +29,12 @@ pipeline {
             steps {
                 withSonarQubeEnv(sonarqube){
                     script {
+                        sh """
                         mvn clean verify sonar:sonar \
                         -Dsonar.projectKey=i27-eureka-05 \
                         -Dsonar.host.url=http://34.86.250.120:9000 \
-                        -Dsonar.login=sqa_7d01297a6e4c6d1d7f64e2f1137dcbc2df213ec4                        
+                        -Dsonar.login=sqa_7d01297a6e4c6d1d7f64e2f1137dcbc2df213ec4    
+                        """                    
                     }
                     timeout (time: 2, unit: "MINUTES" ) {
                         waitForQualityGate abortPipeline: true
