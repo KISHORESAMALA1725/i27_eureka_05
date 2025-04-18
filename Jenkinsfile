@@ -37,20 +37,20 @@ pipeline {
             post {
                 success {
                     script {
-                        def subject = "Success: Build Stage for ${env.JOB_NAME} - Build #${env.BUILD_NUMBER}"
-                        def body = "Build Stage Passed.\n\n" +
-                        "Build Number: ${env.BUILD_NUMBER}\n\n" +
-                        "Job URL: ${env.BUILD_URL}"
-                        sendEmailNotification('kishorecloud.1725@gmail.com', subject, body)
+                        emailext(
+                            subject: "Success: Build Stage for ${env.JOB_NAME} - Build #${env.BUILD_NUMBER}",
+                            body: "Build Stage Passed.\n\nBuild Number: ${env.BUILD_NUMBER}\n\nJob URL: ${env.BUILD_URL}",
+                            to: 'kishorecloud.1725@gmail.com'
+                        )
                     }
                 }
                 failure {
                     script {
-                        def subject = "Failure: Build Stage for ${env.JOB_NAME} - Build #${env.BUILD_NUMBER}"
-                        def body = "Build Stage Failed.\n\n" +
-                        "Build Number: ${env.BUILD_NUMBER}\n\n" +
-                        "Job URL: ${env.BUILD_URL}"
-                        sendEmailNotification('kishorecloud.1725@gmail.com', subject, body)
+                        emailext(
+                            subject: "Failure: Build Stage for ${env.JOB_NAME} - Build #${env.BUILD_NUMBER}",
+                            body: "Build Stage Failed.\n\nBuild Number: ${env.BUILD_NUMBER}\n\nJob URL: ${env.BUILD_URL}",
+                            to: 'kishorecloud.1725@gmail.com'
+                        )
                     }
                 }
             }
@@ -75,16 +75,20 @@ pipeline {
             post {
                 success {
                     script {
-                        def subject = "Success: SonarQube Analysis for ${env.JOB_NAME} - Build #${env.BUILD_NUMBER}"
-                        def body = "SonarQube Analysis Passed.\n\nBuild Number: ${env.BUILD_NUMBER}\nJob URL: ${env.BUILD_URL}"
-                        sendEmailNotification('kishorecloud.1725@gmail.com', subject, body)
+                        emailext(
+                            subject: "Success: SonarQube Analysis for ${env.JOB_NAME} - Build #${env.BUILD_NUMBER}",
+                            body: "SonarQube Analysis Passed.\n\nBuild Number: ${env.BUILD_NUMBER}\nJob URL: ${env.BUILD_URL}",
+                            to: 'kishorecloud.1725@gmail.com'
+                        )
                     }
                 }
                 failure {
                     script {
-                        def subject = "Failure: SonarQube Analysis for ${env.JOB_NAME} - Build #${env.BUILD_NUMBER}"
-                        def body = "SonarQube Analysis Failed.\n\nBuild Number: ${env.BUILD_NUMBER}\nJob URL: ${env.BUILD_URL}"
-                        sendEmailNotification('kishorecloud.1725@gmail.com', subject, body)
+                        emailext(
+                            subject: "Failure: SonarQube Analysis for ${env.JOB_NAME} - Build #${env.BUILD_NUMBER}",
+                            body: "SonarQube Analysis Failed.\n\nBuild Number: ${env.BUILD_NUMBER}\nJob URL: ${env.BUILD_URL}",
+                            to: 'kishorecloud.1725@gmail.com'
+                        )
                     }
                 }
             }
@@ -102,16 +106,20 @@ pipeline {
             post {
                 success {
                     script {
-                        def subject = "Success: Docker Build and Push for ${env.JOB_NAME} - Build #${env.BUILD_NUMBER}"
-                        def body = "Docker build and push completed.\n\nBuild Number: ${env.BUILD_NUMBER}\nJob URL: ${env.BUILD_URL}"
-                        sendEmailNotification('kishorecloud.1725@gmail.com', subject, body)
+                        emailext(
+                            subject: "Success: Docker Build and Push for ${env.JOB_NAME} - Build #${env.BUILD_NUMBER}",
+                            body: "Docker build and push completed.\n\nBuild Number: ${env.BUILD_NUMBER}\nJob URL: ${env.BUILD_URL}",
+                            to: 'kishorecloud.1725@gmail.com'
+                        )
                     }
                 }
                 failure {
                     script {
-                        def subject = "Failure: Docker Build and Push for ${env.JOB_NAME} - Build #${env.BUILD_NUMBER}"
-                        def body = "Docker build or push failed.\n\nBuild Number: ${env.BUILD_NUMBER}\nJob URL: ${env.BUILD_URL}"
-                        sendEmailNotification('kishorecloud.1725@gmail.com', subject, body)
+                        emailext(
+                            subject: "Failure: Docker Build and Push for ${env.JOB_NAME} - Build #${env.BUILD_NUMBER}",
+                            body: "Docker build or push failed.\n\nBuild Number: ${env.BUILD_NUMBER}\nJob URL: ${env.BUILD_URL}",
+                            to: 'kishorecloud.1725@gmail.com'
+                        )
                     }
                 }
             }
@@ -135,16 +143,20 @@ pipeline {
             post {
                 success {
                     script {
-                        def subject = "Success: Deployment to Dev for ${env.JOB_NAME} - Build #${env.BUILD_NUMBER}"
-                        def body = "Deployment to Dev completed.\n\nBuild Number: ${env.BUILD_NUMBER}\nJob URL: ${env.BUILD_URL}"
-                        sendEmailNotification('kishorecloud.1725@gmail.com', subject, body)
+                        emailext(
+                            subject: "Success: Deployment to Dev for ${env.JOB_NAME} - Build #${env.BUILD_NUMBER}",
+                            body: "Deployment to Dev completed.\n\nBuild Number: ${env.BUILD_NUMBER}\nJob URL: ${env.BUILD_URL}",
+                            to: 'kishorecloud.1725@gmail.com'
+                        )
                     }
                 }
                 failure {
                     script {
-                        def subject = "Failure: Deployment to Dev for ${env.JOB_NAME} - Build #${env.BUILD_NUMBER}"
-                        def body = "Deployment to Dev failed.\n\nBuild Number: ${env.BUILD_NUMBER}\nJob URL: ${env.BUILD_URL}"
-                        sendEmailNotification('kishorecloud.1725@gmail.com', subject, body)
+                        emailext(
+                            subject: "Failure: Deployment to Dev for ${env.JOB_NAME} - Build #${env.BUILD_NUMBER}",
+                            body: "Deployment to Dev failed.\n\nBuild Number: ${env.BUILD_NUMBER}\nJob URL: ${env.BUILD_URL}",
+                            to: 'kishorecloud.1725@gmail.com'
+                        )
                     }
                 }
             }
