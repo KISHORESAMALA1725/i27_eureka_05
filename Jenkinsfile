@@ -69,8 +69,8 @@ pipeline {
         stage ('DEPLOT_TO_DEV') {
             steps {
                 withCredentials([usernamePassword(credentialsId: 'john_docker_vm_creds', usernameVariable: 'USERNAME', passwordVariable: 'PASSWORD')]) {
-                    script {
                         echo " ********** *********** ********** ************ "
+                    script {
                         sh "sshpass -p '$PASSWORD' -v ssh -o StrictHostKeyChecking=no '$USERNAME'@'$DOCKER_VM' \"docker images\""
                         echo " ********** *********** ********** ************ "
                     }
