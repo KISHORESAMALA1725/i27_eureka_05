@@ -48,7 +48,7 @@ pipeline {
                 script {
                     sh """
                     echo "Source JAR_FORMAT i27-${env.APPLICATION_NAME}-${env.POM_VERSION}.${env.POM_PACKAGING}"
-                    echo "Target JAR_FORMAT i27-${env.APPLICTION_NAME}-${BRANCH_NAME}-${currentBuild.number}.${env.POM_PACKAGING}""
+                    echo "Target JAR_FORMAT i27-${env.APPLICTION_NAME}-${BRANCH_NAME}-${currentBuild.number}.${env.POM_PACKAGING}"
                     """
                 }
             }
