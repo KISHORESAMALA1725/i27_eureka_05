@@ -14,6 +14,7 @@ pipeline {
         POM_PACKAGING = readMavenPom().getPackaging()
         DOCKER_HUB = "docker.io/kishoresamala84"
         DOCKER_CREDS = credentials('kishoresamala84_docker_creds')
+        DOCKER_VM = '34.48.75.124'
     }
 
     stages {
@@ -48,7 +49,7 @@ pipeline {
                 script {
                     sh """
                     echo "Source JAR_FORMAT i27-${env.APPLICATION_NAME}-${env.POM_VERSION}.${env.POM_PACKAGING}"
-                    echo "Target JAR_FORMAT i27-${env.APPLICTION_NAME}-${BRANCH_NAME}-${currentBuild.number}.${env.POM_PACKAGING}"
+                    echo "Target JAR_FORMAT i27-${env.APPLICTION_NAME}-${currentBuild.number}-${BRANCH_NAME}.${env.POM_PACKAGING}"
                     """
                 }
             }
