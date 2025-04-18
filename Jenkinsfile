@@ -10,159 +10,114 @@ pipeline {
 
     environment {
         APPLICATION_NAME = 'eureka'
-        POM_VERSION = readMavenPom().getVersion()
-        POM_PACKAGING = readMavenPom().getPackaging()
+        POM_VERSION = ''
+        POM_PACKAGING = ''
         DOCKER_HUB = "docker.io/kishoresamala84"
         DOCKER_CREDS = credentials('kishoresamala84_docker_creds')
         DOCKER_VM = '34.48.75.124'
     }
 
     stages {
-        stage ('BUILD_STAGE') {
+        stage('INIT_POM_VALUES') {
             steps {
-                echo " ***** BUILD STAGE ***** "
-                sh "mvn clean package -DskipTest=true"
+                script {
+                    def pom = readMavenPom()
+                    env.POM_VERSION = pom.version
+                    env.POM_PACKAGING = pom.packaging
+                }
+            }
+        }
+
+        stage('BUILD_STAGE') {
+            steps {
+                echo "***** BUILD STAGE *****"
+                sh "mvn clean package -DskipTests=true"
                 archiveArtifacts 'target/*.jar'
             }
             post {
-                success{
-                    script{                
-                        def subject = "Success: Job is ${env.JOB_NAME} -- Build # is [${env.BUILD_NUMBER}] status: ${currentBuild.currentResult}"
-                        def body =  "Build Number: ${env.BUILD_NUMBER} \n\n" +
-                                "status: ${currentBuild.currentResult} \n\n" +
-                                "Job URL: ${env.BUILD_URL}"
-                        sendEmailNotification('kishorecloud.1725@gmail.com', subject, body)               
-                    }            
-                }
-
-                failure{
-                    script{                     
-                        def subject = "Failure: Job is ${env.JOB_NAME} -- Build # is [${env.BUILD_NUMBER}] status: ${currentBuild.currentResult}"
-                        def body =  "Build Number: ${env.BUILD_NUMBER} \n\n" +
-                                "status: ${currentBuild.currentResult} \n\n" +
-                                "Job URL: ${env.BUILD_URL}"
-                        sendEmailNotification('kishorecloud.1725@gmail.com', subject, body)                      
-                    }            
-                }
-            }     
-    }
-
-
-
-
-        stage ('SONARQUBE_STAGE') {
-            steps {
-                withSonarQubeEnv('sonarqube'){
+                success {
                     script {
-                        sh """
-                        mvn sonar:sonar \
-                        -Dsonar.projectKey=i27-eureka-05 \
-                        -Dsonar.host.url=http://34.86.250.120:9000 \
-                        -Dsonar.login=sqa_7d01297a6e4c6d1d7f64e2f1137dcbc2df213ec4    
-                        """                    
+                        def subject = "Success: Build Stage for ${env.JOB_NAME} - Build #${env.BUILD_NUMBER}"
+                        def body = "Build Stage Passed.\n\n" +
+                        "Build Number: ${env.BUILD_NUMBER}\n\n" +
+                        "Job URL: ${env.BUILD_URL}"
+                        sendEmailNotification('kishorecloud.1725@gmail.com', subject, body)
                     }
                 }
-                timeout (time: 2, unit: "MINUTES" ) {
-                    waitForQualityGate abortPipeline: true
-                }                
-            }
-        post {
-            success{
-                script{                
-                    def subject = "Success: Job is ${env.JOB_NAME} -- Build # is [${env.BUILD_NUMBER}] status: ${currentBuild.currentResult}"
-                    def body =  "Build Number: ${env.BUILD_NUMBER} \n\n" +
-                            "status: ${currentBuild.currentResult} \n\n" +
-                            "Job URL: ${env.BUILD_URL}"
-                    sendEmailNotification('kishorecloud.1725@gmail.com', subject, body)               
-                }            
-            }
-
-            failure{
-                script{                     
-                    def subject = "Failure: Job is ${env.JOB_NAME} -- Build # is [${env.BUILD_NUMBER}] status: ${currentBuild.currentResult}"
-                    def body =  "Build Number: ${env.BUILD_NUMBER} \n\n" +
-                            "status: ${currentBuild.currentResult} \n\n" +
-                            "Job URL: ${env.BUILD_URL}"
-                    sendEmailNotification('kishorecloud.1725@gmail.com', subject, body)                      
-                }            
-            }
-        }          
-        
-        }
-
-         
-
-        stage ('BUILD_FORMAT_STAGE') {
-            steps {
-                script {
-                    sh """
-                    echo "Source JAR_FORMAT i27-${env.APPLICATION_NAME}-${env.POM_VERSION}.${env.POM_PACKAGING}"
-                    echo "Target JAR_FORMAT i27-${env.APPLICATION_NAME}-${BRANCH_NAME}-${currentBuild.number}.${env.POM_PACKAGING}"
-                    """
+                failure {
+                    script {
+                        def subject = "Failure: Build Stage for ${env.JOB_NAME} - Build #${env.BUILD_NUMBER}"
+                        def body = "Build Stage Failed.\n\n" +
+                        "Build Number: ${env.BUILD_NUMBER}\n\n" +
+                        "Job URL: ${env.BUILD_URL}"
+                        sendEmailNotification('kishorecloud.1725@gmail.com', subject, body)
+                    }
                 }
             }
-        post {
-            success{
-                script{                
-                    def subject = "Success: Job is ${env.JOB_NAME} -- Build # is [${env.BUILD_NUMBER}] status: ${currentBuild.currentResult}"
-                    def body =  "Build Number: ${env.BUILD_NUMBER} \n\n" +
-                            "status: ${currentBuild.currentResult} \n\n" +
-                            "Job URL: ${env.BUILD_URL}"
-                    sendEmailNotification('kishorecloud.1725@gmail.com', subject, body)               
-                }            
-            }
-
-            failure{
-                script{                     
-                    def subject = "Failure: Job is ${env.JOB_NAME} -- Build # is [${env.BUILD_NUMBER}] status: ${currentBuild.currentResult}"
-                    def body =  "Build Number: ${env.BUILD_NUMBER} \n\n" +
-                            "status: ${currentBuild.currentResult} \n\n" +
-                            "Job URL: ${env.BUILD_URL}"
-                    sendEmailNotification('kishorecloud.1725@gmail.com', subject, body)                      
-                }            
-            }
-        }          
-       
-       
         }
 
+        stage('SONARQUBE_STAGE') {
+            steps {
+                withSonarQubeEnv('sonarqube') {
+                    script {
+                        sh """
+                            mvn sonar:sonar \
+                            -Dsonar.projectKey=i27-eureka-05 \
+                            -Dsonar.host.url=http://34.86.250.120:9000 \
+                            -Dsonar.login=${env.SONAR_TOKEN}
+                        """
+                    }
+                }
+                timeout(time: 2, unit: "MINUTES") {
+                    waitForQualityGate abortPipeline: true
+                }
+            }
+            post {
+                success {
+                    script {
+                        def subject = "Success: SonarQube Analysis for ${env.JOB_NAME} - Build #${env.BUILD_NUMBER}"
+                        def body = "SonarQube Analysis Passed.\n\nBuild Number: ${env.BUILD_NUMBER}\nJob URL: ${env.BUILD_URL}"
+                        sendEmailNotification('kishorecloud.1725@gmail.com', subject, body)
+                    }
+                }
+                failure {
+                    script {
+                        def subject = "Failure: SonarQube Analysis for ${env.JOB_NAME} - Build #${env.BUILD_NUMBER}"
+                        def body = "SonarQube Analysis Failed.\n\nBuild Number: ${env.BUILD_NUMBER}\nJob URL: ${env.BUILD_URL}"
+                        sendEmailNotification('kishorecloud.1725@gmail.com', subject, body)
+                    }
+                }
+            }
+        }
 
-        stage ('DOCKER_BUILD_AND_PUSH') {
+        stage('DOCKER_BUILD_AND_PUSH') {
             steps {
                 script {
                     sh "cp ${WORKSPACE}/target/i27-${env.APPLICATION_NAME}-${env.POM_VERSION}.${env.POM_PACKAGING} ./.cicd"
                     sh "docker build --no-cache --build-arg JAR_SOURCE=i27-${env.APPLICATION_NAME}-${env.POM_VERSION}.${env.POM_PACKAGING} -t ${env.DOCKER_HUB}/${env.APPLICATION_NAME}:${GIT_COMMIT} ./.cicd"
                     sh "docker login -u ${env.DOCKER_CREDS_USR} -p ${env.DOCKER_CREDS_PSW}"
                     sh "docker push ${env.DOCKER_HUB}/${env.APPLICATION_NAME}:${GIT_COMMIT}"
-                }   
+                }
             }
-
-        post {
-            success{
-                script{                
-                    def subject = "Success: Job is ${env.JOB_NAME} -- Build # is [${env.BUILD_NUMBER}] status: ${currentBuild.currentResult}"
-                    def body =  "Build Number: ${env.BUILD_NUMBER} \n\n" +
-                            "status: ${currentBuild.currentResult} \n\n" +
-                            "Job URL: ${env.BUILD_URL}"
-                    sendEmailNotification('kishorecloud.1725@gmail.com', subject, body)               
-                }            
+            post {
+                success {
+                    script {
+                        def subject = "Success: Docker Build and Push for ${env.JOB_NAME} - Build #${env.BUILD_NUMBER}"
+                        def body = "Docker build and push completed.\n\nBuild Number: ${env.BUILD_NUMBER}\nJob URL: ${env.BUILD_URL}"
+                        sendEmailNotification('kishorecloud.1725@gmail.com', subject, body)
+                    }
+                }
+                failure {
+                    script {
+                        def subject = "Failure: Docker Build and Push for ${env.JOB_NAME} - Build #${env.BUILD_NUMBER}"
+                        def body = "Docker build or push failed.\n\nBuild Number: ${env.BUILD_NUMBER}\nJob URL: ${env.BUILD_URL}"
+                        sendEmailNotification('kishorecloud.1725@gmail.com', subject, body)
+                    }
+                }
             }
-
-            failure{
-                script{                     
-                    def subject = "Failure: Job is ${env.JOB_NAME} -- Build # is [${env.BUILD_NUMBER}] status: ${currentBuild.currentResult}"
-                    def body =  "Build Number: ${env.BUILD_NUMBER} \n\n" +
-                            "status: ${currentBuild.currentResult} \n\n" +
-                            "Job URL: ${env.BUILD_URL}"
-                    sendEmailNotification('kishorecloud.1725@gmail.com', subject, body)                      
-                }            
-            }
-        }              
         }
 
-        
-
-        stage ('DEPLOT_TO_DEV') {
+        stage('DEPLOY_TO_DEV') {
             steps {
                 withCredentials([usernamePassword(credentialsId: 'john_docker_vm_creds', usernameVariable: 'USERNAME', passwordVariable: 'PASSWORD')]) {
                     script {
@@ -170,44 +125,29 @@ pipeline {
                             sh "sshpass -p '$PASSWORD' -v ssh -o StrictHostKeyChecking=no '$USERNAME'@'$DOCKER_VM' \"docker stop ${env.APPLICATION_NAME}-dev\""
                             sh "sshpass -p '$PASSWORD' -v ssh -o StrictHostKeyChecking=no '$USERNAME'@'$DOCKER_VM' \"docker rm ${env.APPLICATION_NAME}-dev\""
                         }
-                        catch (err){
+                        catch (err) {
                             echo "Caught Error: $err"
                         }
                         sh "sshpass -p '$PASSWORD' -v ssh -o StrictHostKeyChecking=no '$USERNAME'@'$DOCKER_VM' \"docker container run -dit -p 8761:8761 --name ${env.APPLICATION_NAME}-dev ${env.DOCKER_HUB}/${env.APPLICATION_NAME}:${GIT_COMMIT}\""
-
+                    }
+                }
+            }
+            post {
+                success {
+                    script {
+                        def subject = "Success: Deployment to Dev for ${env.JOB_NAME} - Build #${env.BUILD_NUMBER}"
+                        def body = "Deployment to Dev completed.\n\nBuild Number: ${env.BUILD_NUMBER}\nJob URL: ${env.BUILD_URL}"
+                        sendEmailNotification('kishorecloud.1725@gmail.com', subject, body)
+                    }
+                }
+                failure {
+                    script {
+                        def subject = "Failure: Deployment to Dev for ${env.JOB_NAME} - Build #${env.BUILD_NUMBER}"
+                        def body = "Deployment to Dev failed.\n\nBuild Number: ${env.BUILD_NUMBER}\nJob URL: ${env.BUILD_URL}"
+                        sendEmailNotification('kishorecloud.1725@gmail.com', subject, body)
                     }
                 }
             }
         }
     }
-
-    post {
-        success{
-            script{                
-                def subject = "Success: Job is ${env.JOB_NAME} -- Build # is [${env.BUILD_NUMBER}] status: ${currentBuild.currentResult}"
-                def body =  "Build Number: ${env.BUILD_NUMBER} \n\n" +
-                        "status: ${currentBuild.currentResult} \n\n" +
-                        "Job URL: ${env.BUILD_URL}"
-                sendEmailNotification('kishorecloud.1725@gmail.com', subject, body)               
-            }            
-        }
-
-        failure{
-            script{                     
-                def subject = "Failure: Job is ${env.JOB_NAME} -- Build # is [${env.BUILD_NUMBER}] status: ${currentBuild.currentResult}"
-                def body =  "Build Number: ${env.BUILD_NUMBER} \n\n" +
-                        "status: ${currentBuild.currentResult} \n\n" +
-                        "Job URL: ${env.BUILD_URL}"
-                sendEmailNotification('kishorecloud.1725@gmail.com', subject, body)                      
-            }            
-        }
-    }    
-}
-
-def sendEmailNotification(String recipient, String subject, String body) {
-    mail (
-        to: recipient,
-        subject: subject,
-        body: body
-    )
 }
