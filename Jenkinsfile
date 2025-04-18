@@ -46,8 +46,8 @@ pipeline {
         stage ('BUILD_FORMAT_STAGE') {
             steps {
                 script {
-                    sh "Source JAR_FORMAT i27-${env.APPLICATION_NAME}-${env.POM_VERSION}.${env.POM_PACKAGING}"
-                    sh "Target JAR_FORMAT i27-${env.APPLICTION_NAME}-${BRANCH_NAME}-${currentBuild.number}"
+                    sh echo "Source JAR_FORMAT i27-${env.APPLICATION_NAME}-${env.POM_VERSION}.${env.POM_PACKAGING}"
+                    sh echo "Target JAR_FORMAT i27-${env.APPLICTION_NAME}-${BRANCH_NAME}-${currentBuild.number}"
                 }
             }
         }
