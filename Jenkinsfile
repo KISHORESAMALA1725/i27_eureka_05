@@ -54,5 +54,16 @@ pipeline {
                 }
             }
         }
+
+        stage ('DOCKER_BUILD_AND_PUSH') {
+            steps {
+                script {
+                    sh "cp ${WORKSPACE}/target/i27-${env.APPLICATION_NAME}-${env.POM_VERSION}.${env.POM_PACKAGING} ./.cicd"
+                    sh "docker build --no-cache --build-arg JAR_SOURCE=i27-${env.APPLICATION_NAME}-${env.POM_VERSION}.${env.POM_PACKAGING} -t ${env.APPLICATION_NAME}/${env.DOCKER_HUB}:${GIT_COMMIT} ./.cicd"
+                    sh "docker login -u ${env.DOCKER_CREDS} -p ${env.DOCKER_CREDS_PSW}"
+                    sh "docker push ${env.APPLICATION_NAME}/${env.DOCKER_HUB}:${GIT_COMMIT}"
+                }   
+            }
+        }
     }
 }
