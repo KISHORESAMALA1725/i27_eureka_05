@@ -8,7 +8,7 @@ ARG JAR_SOURCE
 
 COPY ["${JAR_SOURCE}", "/opt/i27/i27-eureka.jar"]
 
-RUN chmod 777
+RUN chmod 777 /opt/i27
 
 EXPOSE 8761
 
