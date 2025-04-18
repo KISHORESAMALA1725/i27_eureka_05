@@ -77,7 +77,7 @@ pipeline {
                         catch (err){
                             echo "Caught Error: $err"
                         }
-                        sh "sshpass -p '$PASSWORD' -v ssh -o StrictHostKeyChecking=no '$USERNAME'@'$DOCKER_VM' \"docker container run -dir -p 8761:8761 --name ${env.APPLICATION_NAME}-dev${env.DOCKER_HUB}/${env.APPLICATION_NAME}:${GIT_COMMIT}\""
+                        sh "sshpass -p '$PASSWORD' -v ssh -o StrictHostKeyChecking=no '$USERNAME'@'$DOCKER_VM' \"docker container run -dit -p 8761:8761 --name ${env.APPLICATION_NAME}-dev${env.DOCKER_HUB}/${env.APPLICATION_NAME}:${GIT_COMMIT}\""
 
                     }
                 }
