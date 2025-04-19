@@ -107,7 +107,7 @@ pipeline {
             }
             steps {
                 script {
-                    deployToDev('dev','5000','8761').call()
+                    deployToDev('dev', '5000', '8761').call()
                 }
             }
         }
@@ -122,7 +122,7 @@ pipeline {
             }
             steps {
                 script {
-                    deployToDev('test','5001','8761').call()
+                    deployToDev('test', '5001', '8761').call()
                 }
             }
         }
@@ -138,7 +138,7 @@ pipeline {
             steps {
                 script {
                     imageValidation().call
-                    deployToDev('stage','5002','8761').call()
+                    deployToDev('stage', '5002', '8761').call()
                 }
             }
         }
@@ -153,7 +153,7 @@ pipeline {
             }
             steps {
                 script {
-                    deployToDev('prod','5003','8761').call()
+                    deployToDev('prod', '5003', '8761').call()
                 }
             }
         }
