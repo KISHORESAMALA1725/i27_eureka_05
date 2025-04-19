@@ -110,6 +110,23 @@ def buildApp() {
     }
 }
 
+def imageValidation() {
+    return {
+        echo "Trying to pull the image"
+        try {
+            sh "docker pull ${env.DOCKER_HUB}/${env.APPLICATION_NAME}/${GIT_COMMIT}"
+            echo " Image pulled successfully"          
+            }
+        catch (err){
+        echo "Caught Error: $err"
+        echo "OOOOPPPPSSSSS@@!!!! Image doesnot exist, building now"
+            buildApp().call()
+            dockerBuildAndPush().call()
+
+        }
+    }
+}
+
 def dockerBuildAndPush() {
     return {
             script {
@@ -137,4 +154,4 @@ def deployToDev(envDeploy, hostPort, contPort) {
                 }
             }      
         }
-}
+     }
