@@ -14,7 +14,7 @@ pipeline {
         POM_PACKAGING = readMavenPom().getPackaging()
         DOCKER_HUB = "docker.io/kishoresamala84"
         DOCKER_CREDS = credentials('kishoresamala84_docker_creds')
-        DOCKER_VM = '34.48.75.124'
+        DOCKER_VM = '34.21.68.255'
     }
 
     stages {
