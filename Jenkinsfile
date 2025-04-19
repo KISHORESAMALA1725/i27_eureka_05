@@ -123,6 +123,7 @@ def dockerBuildAndPush() {
 
 def deployToDev(envDeploy, hostPort, contPort) {
     return {
+        echo "********* Deploying to dev Environment **************"
             withCredentials([usernamePassword(credentialsId: 'john_docker_vm_creds', usernameVariable: 'USERNAME', passwordVariable: 'PASSWORD')]) {
                 script {
                     try {
