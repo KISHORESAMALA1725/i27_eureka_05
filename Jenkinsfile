@@ -153,6 +153,7 @@ pipeline {
             }
             steps {
                 script {
+                    imageValidation().call()
                     deployToDev('prod', '5003', '8761').call()
                 }
             }
