@@ -8,6 +8,16 @@ pipeline {
         jdk 'jdk-17'
     }
 
+    parameters {
+        choice(name: 'buildOnly', choices: 'no\nyes', description: 'Will do BUILD-ONLY')
+        choice(name: 'scanOnly', choices: 'no\nyes', description: 'Will perform SCAN-ONLY')
+        choice(name: 'dockerBuild&Push', choices: 'no\nyes', description: 'Docker build and push')
+        choice(name: 'deploytoDev', choices: 'no\nyes', description: 'Deploying to Dev')
+        choice(name: 'deploytoTest', choices: 'no\nyes', description: 'Deploying to Test')
+        choice(name: 'deploytoStage', choices: 'no\nyes', description: 'Deploying to Stage')
+        choice(name: 'deploytoProd', choices: 'no\nyes', description: 'Deploying to Prod')        
+    }
+
     environment {
         APPLICATION_NAME = 'eureka'
         POM_VERSION = readMavenPom().getVersion()
@@ -19,6 +29,14 @@ pipeline {
 
     stages {
         stage ('BUILD_STAGE') {
+            when {
+                anyOf {
+                    expression {
+                        params.scanOnly == 'yes'
+                        params.buildOnly =='yes'
+                    }
+                }
+            }            
             steps {
                 script{
                     buildApp().call()
@@ -27,6 +45,15 @@ pipeline {
         }        
 
         stage ('SONARQUBE_STAGE') {
+            when {
+                anyOf {
+                    expression {
+                        params.buildOnly == 'yes'
+                        params.scanOnly == 'yes'
+                        params.dockerBuildAndPush == 'yes'
+                    }
+                }
+            }
             steps {
                 withSonarQubeEnv('sonarqube'){
                     script {
@@ -56,6 +83,13 @@ pipeline {
         }
 
         stage ('DOCKER_BUILD_AND_PUSH') {
+            when {
+                anyOf {
+                    expression {
+                        params.dockerBuildAndPush == 'yes'
+                    }
+                }
+            }
             steps {
                 script {
                     dockerBuildAndPush().call()                    
@@ -64,6 +98,13 @@ pipeline {
         }
 
         stage ('DEPLOY_TO_DEV') {
+            when {
+                anyOf {
+                    expression {
+                        params.deployToDev == 'yes'
+                    }
+                }
+            }
             steps {
                 script {
                     deployToDev('dev','5000','8761').call()
@@ -72,25 +113,47 @@ pipeline {
         }
 
         stage ('DEPLOY_TO_TEST') {
+            when {
+                anyOf {
+                    expression {
+                        params.deployToTest == 'yes'
+                    }
+                }
+            }
             steps {
                 script {
-                    deployToDev('dev','5001','8761').call()
+                    deployToDev('test','5001','8761').call()
                 }
             }
         }
 
         stage ('DEPLOY_TO_STAGE') {
+            when {
+                anyOf {
+                    expression {
+                        params.deployToStage == 'yes'
+                    }
+                }
+            }
             steps {
                 script {
-                    deployToDev('dev','5002','8761').call()
+                    imageValidation().call
+                    deployToDev('stage','5002','8761').call()
                 }
             }
         }
 
         stage ('DEPLOY_TO_PROD') {
+            when {
+                anyOf{
+                    expression {
+                        params.deploytoProd == 'yes'
+                    }
+                }
+            }
             steps {
                 script {
-                    deployToDev('dev','5003','8761').call()
+                    deployToDev('prod','5003','8761').call()
                 }
             }
         }
