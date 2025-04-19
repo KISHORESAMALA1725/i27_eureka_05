@@ -66,7 +66,31 @@ pipeline {
         stage ('DEPLOY_TO_DEV') {
             steps {
                 script {
-                    deployToDev('dev','8761','8761').call()
+                    deployToDev('dev','5000','8761').call()
+                }
+            }
+        }
+
+        stage ('DEPLOY_TO_TEST') {
+            steps {
+                script {
+                    deployToDev('dev','5001','8761').call()
+                }
+            }
+        }
+
+        stage ('DEPLOY_TO_STAGE') {
+            steps {
+                script {
+                    deployToDev('dev','5002','8761').call()
+                }
+            }
+        }
+
+        stage ('DEPLOY_TO_PROD') {
+            steps {
+                script {
+                    deployToDev('dev','5003','8761').call()
                 }
             }
         }
