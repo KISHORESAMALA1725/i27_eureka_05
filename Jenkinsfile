@@ -121,7 +121,7 @@ def dockerBuildAndPush() {
     }
 }
 
-def DeployToDev(envDeploy, hostPort, contPort) {
+def deployToDev(envDeploy, hostPort, contPort) {
     return {
         steps {
             withCredentials([usernamePassword(credentialsId: 'john_docker_vm_creds', usernameVariable: 'USERNAME', passwordVariable: 'PASSWORD')]) {
