@@ -19,7 +19,7 @@ pipeline {
     }
 
     environment {
-        APPLICATION_NAME = 'eureka'
+        APPLICATION_NAME = '"${pipelineParams.appName}"'
         POM_VERSION = readMavenPom().getVersion()
         POM_PACKAGING = readMavenPom().getPackaging()
         DOCKER_HUB = "docker.io/kishoresamala84"
@@ -39,7 +39,7 @@ pipeline {
             }            
             steps {
                 script{
-                    buildApp().call()
+                    buildApp("${env.APPLICATION_NAME}")
                 }
             }
         }        
