@@ -123,7 +123,6 @@ def dockerBuildAndPush() {
 
 def deployToDev(envDeploy, hostPort, contPort) {
     return {
-        steps {
             withCredentials([usernamePassword(credentialsId: 'john_docker_vm_creds', usernameVariable: 'USERNAME', passwordVariable: 'PASSWORD')]) {
                 script {
                     try {
@@ -134,9 +133,7 @@ def deployToDev(envDeploy, hostPort, contPort) {
                         echo "Caught Error: $err"
                     }
                     sh "sshpass -p '$PASSWORD' -v ssh -o StrictHostKeyChecking=no '$USERNAME'@'$DOCKER_VM' \"docker container run -dit -p $hostPort:$contPort --name ${env.APPLICATION_NAME}-$envDeploy ${env.DOCKER_HUB}/${env.APPLICATION_NAME}:${GIT_COMMIT}\""
-
                 }
-            }
-        }        
-    }
+            }      
+        }
 }
