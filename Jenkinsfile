@@ -66,7 +66,7 @@ pipeline {
         stage ('DEPLOY_TO_DEV') {
             steps {
                 script {
-                deployToDev('dev','8761','8761').call()
+                    deployToDev('dev','8761','8761').call()
                 }
             }
         }
