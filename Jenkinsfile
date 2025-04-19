@@ -50,7 +50,6 @@ pipeline {
                     expression {
                         params.buildOnly == 'yes'
                         params.scanOnly == 'yes'
-                        params.dockerBuildAndPush == 'yes'
                     }
                 }
             }
