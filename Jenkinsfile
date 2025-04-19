@@ -45,10 +45,10 @@ pipeline {
         stage ('SONARQUBE_STAGE') {
             when {
                 expression {
-                    params.buildOnly == 'yes'
                     params.scanOnly == 'yes'
+                    params.buildOnly =='yes'
                 }
-            }
+            } 
             steps {
                 echo "****************** Starting Sonar Scans with Quality Gates ******************"
                 withSonarQubeEnv('sonarqube'){
