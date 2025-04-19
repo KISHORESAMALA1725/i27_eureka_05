@@ -105,7 +105,7 @@ def sendEmailNotification(String recipient, String subject, String body) {
     )
 }
 
-def BuildApp() {
+def buildApp() {
     return {
             sh "mvn clean package -DskipTest=true"
             archiveArtifacts 'target/*.jar'
