@@ -54,6 +54,7 @@ pipeline {
                 }
             }
             steps {
+                echo "****************** Starting Sonar Scans with Quality Gates ******************"
                 withSonarQubeEnv('sonarqube'){
                     script {
                         sh """
