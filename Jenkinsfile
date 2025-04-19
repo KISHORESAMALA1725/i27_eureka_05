@@ -21,8 +21,7 @@ pipeline {
         stage ('BUILD_STAGE') {
             steps {
                 echo " ***** BUILD STAGE ***** "
-                sh "mvn clean package -DskipTest=true"
-                archiveArtifacts 'target/*.jar'
+                buildApp().call()
             }
         }
 
@@ -35,7 +34,7 @@ pipeline {
                         sh """
                         mvn sonar:sonar \
                         -Dsonar.projectKey=i27-eureka-05 \
-                        -Dsonar.host.url=http://34.86.250.120:9000 \
+                        -Dsonar.host.url=http://35.188.226.250:9000 \
                         -Dsonar.login=sqa_7d01297a6e4c6d1d7f64e2f1137dcbc2df213ec4    
                         """                    
                     }
@@ -59,30 +58,13 @@ pipeline {
 
         stage ('DOCKER_BUILD_AND_PUSH') {
             steps {
-                script {
-                    sh "cp ${WORKSPACE}/target/i27-${env.APPLICATION_NAME}-${env.POM_VERSION}.${env.POM_PACKAGING} ./.cicd"
-                    sh "docker build --no-cache --build-arg JAR_SOURCE=i27-${env.APPLICATION_NAME}-${env.POM_VERSION}.${env.POM_PACKAGING} -t ${env.DOCKER_HUB}/${env.APPLICATION_NAME}:${GIT_COMMIT} ./.cicd"
-                    sh "docker login -u ${env.DOCKER_CREDS_USR} -p ${env.DOCKER_CREDS_PSW}"
-                    sh "docker push ${env.DOCKER_HUB}/${env.APPLICATION_NAME}:${GIT_COMMIT}"
-                }   
+                dockerBuildAndPush().call()
             }
         }
 
-        stage ('DEPLOT_TO_DEV') {
+        stage ('DEPLOY_TO_DEV') {
             steps {
-                withCredentials([usernamePassword(credentialsId: 'john_docker_vm_creds', usernameVariable: 'USERNAME', passwordVariable: 'PASSWORD')]) {
-                    script {
-                        try {
-                            sh "sshpass -p '$PASSWORD' -v ssh -o StrictHostKeyChecking=no '$USERNAME'@'$DOCKER_VM' \"docker stop ${env.APPLICATION_NAME}-dev\""
-                            sh "sshpass -p '$PASSWORD' -v ssh -o StrictHostKeyChecking=no '$USERNAME'@'$DOCKER_VM' \"docker rm ${env.APPLICATION_NAME}-dev\""
-                        }
-                        catch (err){
-                            echo "Caught Error: $err"
-                        }
-                        sh "sshpass -p '$PASSWORD' -v ssh -o StrictHostKeyChecking=no '$USERNAME'@'$DOCKER_VM' \"docker container run -dit -p 8761:8761 --name ${env.APPLICATION_NAME}-dev ${env.DOCKER_HUB}/${env.APPLICATION_NAME}:${GIT_COMMIT}\""
-
-                    }
-                }
+                deployToDev('dev','8761','8761').call()
             }
         }
     }
@@ -116,4 +98,42 @@ def sendEmailNotification(String recipient, String subject, String body) {
         subject: subject,
         body: body
     )
+}
+
+def BuildApp() {
+    return {
+            sh "mvn clean package -DskipTest=true"
+            archiveArtifacts 'target/*.jar'
+    }
+}
+
+def dockerBuildAndPush() {
+    return {
+            script {
+                sh "cp ${WORKSPACE}/target/i27-${env.APPLICATION_NAME}-${env.POM_VERSION}.${env.POM_PACKAGING} ./.cicd"
+                sh "docker build --no-cache --build-arg JAR_SOURCE=i27-${env.APPLICATION_NAME}-${env.POM_VERSION}.${env.POM_PACKAGING} -t ${env.DOCKER_HUB}/${env.APPLICATION_NAME}:${GIT_COMMIT} ./.cicd"
+                sh "docker login -u ${env.DOCKER_CREDS_USR} -p ${env.DOCKER_CREDS_PSW}"
+                sh "docker push ${env.DOCKER_HUB}/${env.APPLICATION_NAME}:${GIT_COMMIT}"
+            }         
+    }
+}
+
+def DeployToDev(envDeploy, hostPort, contPort) {
+    return {
+        steps {
+            withCredentials([usernamePassword(credentialsId: 'john_docker_vm_creds', usernameVariable: 'USERNAME', passwordVariable: 'PASSWORD')]) {
+                script {
+                    try {
+                        sh "sshpass -p '$PASSWORD' -v ssh -o StrictHostKeyChecking=no '$USERNAME'@'$DOCKER_VM' \"docker stop ${env.APPLICATION_NAME}-$envDeploy\""
+                        sh "sshpass -p '$PASSWORD' -v ssh -o StrictHostKeyChecking=no '$USERNAME'@'$DOCKER_VM' \"docker rm ${env.APPLICATION_NAME}-$envDeploy\""
+                    }
+                    catch (err){
+                        echo "Caught Error: $err"
+                    }
+                    sh "sshpass -p '$PASSWORD' -v ssh -o StrictHostKeyChecking=no '$USERNAME'@'$DOCKER_VM' \"docker container run -dit -p $hostPort:$contPort --name ${env.APPLICATION_NAME}-$envDeploy ${env.DOCKER_HUB}/${env.APPLICATION_NAME}:${GIT_COMMIT}\""
+
+                }
+            }
+        }        
+    }
 }
