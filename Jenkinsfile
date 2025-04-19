@@ -30,9 +30,11 @@ pipeline {
     stages {
         stage ('BUILD_STAGE') {
             when {
-                expression {
-                    params.scanOnly == 'yes'
-                    params.buildOnly =='yes'
+                anyOf {
+                    expression {
+                        params.scanOnly == 'yes'
+                        params.buildOnly =='yes'
+                    }
                 }
             }            
             steps {
@@ -44,9 +46,11 @@ pipeline {
 
         stage ('SONARQUBE_STAGE') {
             when {
-                expression {
-                    params.scanOnly == 'yes'
-                    params.buildOnly =='yes'
+                anyOf {
+                    expression {
+                        params.scanOnly == 'yes'
+                        params.buildOnly =='yes'
+                    }
                 }
             } 
             steps {
