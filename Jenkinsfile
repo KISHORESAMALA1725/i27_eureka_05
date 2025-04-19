@@ -137,7 +137,7 @@ pipeline {
             }
             steps {
                 script {
-                    imageValidation().call
+                    imageValidation().call()
                     deployToDev('stage', '5002', '8761').call()
                 }
             }
