@@ -12,10 +12,10 @@ pipeline {
         choice(name: 'buildOnly', choices: 'no\nyes', description: 'Will do BUILD-ONLY')
         choice(name: 'scanOnly', choices: 'no\nyes', description: 'Will perform SCAN-ONLY')
         choice(name: 'dockerBuildAndPush', choices: 'no\nyes', description: 'Docker build and push')
-        choice(name: 'deploytoDev', choices: 'no\nyes', description: 'Deploying to Dev')
-        choice(name: 'deploytoTest', choices: 'no\nyes', description: 'Deploying to Test')
-        choice(name: 'deploytoStage', choices: 'no\nyes', description: 'Deploying to Stage')
-        choice(name: 'deploytoProd', choices: 'no\nyes', description: 'Deploying to Prod')        
+        choice(name: 'deploytodev', choices: 'no\nyes', description: 'Deploying to Dev')
+        choice(name: 'deploytotest', choices: 'no\nyes', description: 'Deploying to Test')
+        choice(name: 'deploytostage', choices: 'no\nyes', description: 'Deploying to Stage')
+        choice(name: 'deploytoprod', choices: 'no\nyes', description: 'Deploying to Prod')        
     }
 
     environment {
@@ -94,13 +94,13 @@ pipeline {
         stage ('DEPLOY_TO_DEV') {
             when {
                 expression {
-                    params.deployToDev == 'yes'
+                    params.deploytodev == 'yes'
                 }
             }
             steps {
                 script {
                     imageValidation().call()
-                    deployToDev('dev', '5000', '8761').call()
+                    dockerDeploy('dev', '5000', '8761').call()
                 }
             }
         }
@@ -108,13 +108,13 @@ pipeline {
         stage ('DEPLOY_TO_TEST') {
             when {
                 expression {
-                    params.deployToTest == 'yes'
+                    params.deploytotest == 'yes'
                 }
             }
             steps {
                 script {
                     imageValidation().call()
-                    deployToDev('test', '5001', '8761').call()
+                    dockerDeploy('test', '5001', '8761').call()
                 }
             }
         }
@@ -122,13 +122,13 @@ pipeline {
         stage ('DEPLOY_TO_STAGE') {
             when {
                 expression {
-                    params.deployToStage == 'yes'
+                    params.deploytostage == 'yes'
                 }
             }
             steps {
                 script {
                     imageValidation().call()
-                    deployToDev('stage', '5002', '8761').call()
+                    dockerDeploy('stage', '5002', '8761').call()
                 }
             }
         }
@@ -136,13 +136,13 @@ pipeline {
         stage ('DEPLOY_TO_PROD') {
             when {
                 expression {
-                    params.deploytoProd == 'yes'
+                    params.deploytoprod == 'yes'
                 }
             }
             steps {
                 script {
                     imageValidation().call()
-                    deployToDev('prod', '5003', '8761').call()
+                    dockerDeploy('prod', '5003', '8761').call()
                 }
             }
         }
@@ -212,7 +212,7 @@ def dockerBuildAndPush() {
     }
 }
 
-def deployToDev(envDeploy, hostPort, contPort) {
+def dockerDeploy(envDeploy, hostPort, contPort) {
     return {
         echo "********* Deploying to dev Environment **************"
             withCredentials([usernamePassword(credentialsId: 'john_docker_vm_creds', usernameVariable: 'USERNAME', passwordVariable: 'PASSWORD')]) {
