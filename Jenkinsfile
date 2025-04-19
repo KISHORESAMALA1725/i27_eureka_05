@@ -107,6 +107,7 @@ pipeline {
             }
             steps {
                 script {
+                    imageValidation().call()                    
                     deployToDev('dev', '5000', '8761').call()
                 }
             }
@@ -122,6 +123,7 @@ pipeline {
             }
             steps {
                 script {
+                    imageValidation().call()
                     deployToDev('test', '5001', '8761').call()
                 }
             }
