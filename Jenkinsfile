@@ -20,8 +20,10 @@ pipeline {
     stages {
         stage ('BUILD_STAGE') {
             steps {
-                echo " ***** BUILD STAGE ***** "
-                buildApp().call()
+                script{
+                    echo " ***** BUILD STAGE ***** "
+                    buildApp().call()
+                }
             }
         }
 
@@ -58,13 +60,17 @@ pipeline {
 
         stage ('DOCKER_BUILD_AND_PUSH') {
             steps {
-                dockerBuildAndPush().call()
+                script {
+                    dockerBuildAndPush().call()                    
+                }
             }
         }
 
         stage ('DEPLOY_TO_DEV') {
             steps {
+                script {
                 deployToDev('dev','8761','8761').call()
+                }
             }
         }
     }
