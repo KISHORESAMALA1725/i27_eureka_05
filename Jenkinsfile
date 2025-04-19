@@ -21,7 +21,6 @@ pipeline {
         stage ('BUILD_STAGE') {
             steps {
                 script{
-                    echo " ***** BUILD STAGE ***** "
                     buildApp().call()
                 }
             }
