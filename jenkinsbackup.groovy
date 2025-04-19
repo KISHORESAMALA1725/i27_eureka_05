@@ -236,23 +236,14 @@ def dockerDeploy(envDeploy, hostPort, contPort){
     return {
         echo "****************** Deploying to $envDeploy Environment  ******************"
         withCredentials([usernamePassword(credentialsId: 'john_docker_vm_passwd', passwordVariable: 'PASSWORD', usernameVariable: 'USERNAME')]) {
-                // some block
-                // we will communicate to the server
                 script {
                     try {
-                        // Stop the container 
                         sh "sshpass -p '$PASSWORD' -v ssh -o StrictHostKeyChecking=no '$USERNAME'@$dev_ip \"docker stop ${env.APPLICATION_NAME}-$envDeploy \""
-
-                        // Remove the Container
                         sh "sshpass -p '$PASSWORD' -v ssh -o StrictHostKeyChecking=no '$USERNAME'@$dev_ip \"docker rm ${env.APPLICATION_NAME}-$envDeploy \""
-
                     }
                     catch(err){
                         echo "Error Caught: $err"
                     }
-                    // Command/syntax to use sshpass
-                    //$ sshpass -p !4u2tryhack ssh -o StrictHostKeyChecking=no username@host.example.com
-                    // Create container 
                     sh "sshpass -p '$PASSWORD' -v ssh -o StrictHostKeyChecking=no '$USERNAME'@$dev_ip \"docker container run -dit -p $hostPort:$contPort --name ${env.APPLICATION_NAME}-$envDeploy ${env.DOCKER_HUB}/${env.APPLICATION_NAME}:${GIT_COMMIT} \""
                 }
         }   
