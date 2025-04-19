@@ -24,9 +24,7 @@ pipeline {
                     buildApp().call()
                 }
             }
-        }
-
-        
+        }        
 
         stage ('SONARQUBE_STAGE') {
             steps {
