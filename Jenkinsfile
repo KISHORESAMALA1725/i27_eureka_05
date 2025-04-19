@@ -30,11 +30,9 @@ pipeline {
     stages {
         stage ('BUILD_STAGE') {
             when {
-                anyOf {
-                    expression {
-                        params.scanOnly == 'yes'
-                        params.buildOnly =='yes'
-                    }
+                expression {
+                    params.scanOnly == 'yes'
+                    params.buildOnly =='yes'
                 }
             }            
             steps {
@@ -46,11 +44,9 @@ pipeline {
 
         stage ('SONARQUBE_STAGE') {
             when {
-                anyOf {
-                    expression {
-                        params.buildOnly == 'yes'
-                        params.scanOnly == 'yes'
-                    }
+                expression {
+                    params.buildOnly == 'yes'
+                    params.scanOnly == 'yes'
                 }
             }
             steps {
@@ -84,10 +80,8 @@ pipeline {
 
         stage ('DOCKER_BUILD_AND_PUSH') {
             when {
-                anyOf {
-                    expression {
-                        params.dockerBuildAndPush == 'yes'
-                    }
+                expression {
+                    params.dockerBuildAndPush == 'yes'
                 }
             }
             steps {
@@ -99,15 +93,13 @@ pipeline {
 
         stage ('DEPLOY_TO_DEV') {
             when {
-                anyOf {
-                    expression {
-                        params.deployToDev == 'yes'
-                    }
+                expression {
+                    params.deployToDev == 'yes'
                 }
             }
             steps {
                 script {
-                    imageValidation().call()                    
+                    imageValidation().call()
                     deployToDev('dev', '5000', '8761').call()
                 }
             }
@@ -115,10 +107,8 @@ pipeline {
 
         stage ('DEPLOY_TO_TEST') {
             when {
-                anyOf {
-                    expression {
-                        params.deployToTest == 'yes'
-                    }
+                expression {
+                    params.deployToTest == 'yes'
                 }
             }
             steps {
@@ -131,10 +121,8 @@ pipeline {
 
         stage ('DEPLOY_TO_STAGE') {
             when {
-                anyOf {
-                    expression {
-                        params.deployToStage == 'yes'
-                    }
+                expression {
+                    params.deployToStage == 'yes'
                 }
             }
             steps {
@@ -147,10 +135,8 @@ pipeline {
 
         stage ('DEPLOY_TO_PROD') {
             when {
-                anyOf{
-                    expression {
-                        params.deploytoProd == 'yes'
-                    }
+                expression {
+                    params.deploytoProd == 'yes'
                 }
             }
             steps {
