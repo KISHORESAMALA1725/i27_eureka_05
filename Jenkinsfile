@@ -204,12 +204,10 @@ def imageValidation() {
             sh "docker pull ${env.DOCKER_HUB}/${env.APPLICATION_NAME}/${GIT_COMMIT}"
             echo " Image pulled successfully"          
             }
-        catch (err){
-        echo "Caught Error: $err"
-        echo "OOOOPPPPSSSSS@@!!!! Image doesnot exist, building now"
+        catch(Exception e) {
+            println("***** OOPS, the docker images with this tag is not available in the repo, so creating the image********")
             buildApp().call()
             dockerBuildAndPush().call()
-
         }
     }
 }
